@@ -1,2 +1,3 @@
-# app_monitoramento-lixo
-My final project for uni.
+# My final project for uni!
+
+I'll add more things as I'll continue to grow it.
