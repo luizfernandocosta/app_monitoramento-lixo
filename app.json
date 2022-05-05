@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "app_monitoramento-lixo",
-    "slug": "app_monitoramento-lixo",
+    "name": "SignalBin",
+    "slug": "SignalBin",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/tcc_icon.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/tcc_splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#F6F8FF"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -17,13 +17,17 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.signalbin.signalbin",
+      "buildNumber": "1.0.0"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
-      }
+        "foregroundImage": "./assets/tcc_icon.png",
+        "backgroundColor": "#F6F8FF"
+      },
+      "package": "com.signalbin.signalbin",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/favicon.png"

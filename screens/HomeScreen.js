@@ -3,8 +3,21 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import AppLoading from 'expo-app-loading';
+import { useFonts } from 'expo-font';
 
 export default function App({ navigation }) {
+
+    let [fontsLoaded] = useFonts({
+        'Inter-SemiBold': require('../assets/fonts/Inter-SemiBold.ttf'),
+        'Inter-Regular': require('../assets/fonts/Inter-Regular.ttf'),
+        'Inter-Medium': require('../assets/fonts/Inter-Medium.ttf'),
+      });
+    
+      if (!fontsLoaded) {
+        return <AppLoading />;
+      }
+
   return (
     <View style={styles.container}>
       <Image
@@ -34,6 +47,7 @@ when to take action</Text>
         <TouchableOpacity 
         style={[{backgroundColor: "#6E45B7"},styles.button]}
         activeOpacity={0.8}
+        onPress={() => navigation.navigate('SignUp')}
         >
             <Text style={styles.buttonText}>
                 Register
@@ -59,11 +73,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: {
-    fontSize: 48
+    fontSize: 48,
+    fontFamily: 'Inter-Medium',
   },
   subtitle: {
     fontSize: 20,
     textAlign: 'center',
+    fontFamily: 'Inter-Regular',
   },
   buttonView: {
     flexDirection: 'row',
