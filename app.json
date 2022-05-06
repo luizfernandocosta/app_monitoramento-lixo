@@ -27,7 +27,8 @@
         "backgroundColor": "#F6F8FF"
       },
       "package": "com.signalbin.signalbin",
-      "versionCode": 1
+      "versionCode": 1,
+      "softwareKeyboardLayoutMode": "pan"
     },
     "web": {
       "favicon": "./assets/favicon.png"
