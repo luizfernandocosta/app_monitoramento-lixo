@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "./screens/HomeScreen";
 import SignIn from "./screens/SignIn";
 import SignUp from "./screens/SignUp";
+import Dash from "./screens/Dash";
 
 // Creating a Stack Navigator
 const Home = createNativeStackNavigator();
@@ -23,6 +24,7 @@ export default function App() {
         <Home.Screen name="Home" component={HomeScreen} />
         <Home.Screen name="SignIn" component={SignIn} />
         <Home.Screen name="SignUp" component={SignUp} />
+        <Home.Screen name="Dash" component={Dash} />
       </Home.Navigator>
     </NavigationContainer>
   );
