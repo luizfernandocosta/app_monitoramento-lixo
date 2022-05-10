@@ -13,8 +13,6 @@ import { useFonts } from "expo-font";
 
 export default function App({ navigation, route }) {
 
-    const info = route.params.response;
-
   let [fontsLoaded] = useFonts({
     "Inter-SemiBold": require("../assets/fonts/Inter-SemiBold.ttf"),
     "Inter-Regular": require("../assets/fonts/Inter-Regular.ttf"),
@@ -29,10 +27,8 @@ export default function App({ navigation, route }) {
   return (
     <View style={styles.container}>
       <View style={styles.welcomeView}>
-        <Text style={styles.welcomeTitle}>Funcionou</Text>
-        <Text style={styles.welcomeSubtitle}>Autenticado no Firebase</Text>
-        <Text style={styles.welcomeSubtitle}>Seja bem vindo, {info.name}</Text>
-        <Text style={styles.welcomeSubtitle}>{info.email}</Text>
+        <Text style={styles.welcomeTitle}>Segunda tab</Text>
+        <Text style={styles.welcomeSubtitle}>Aqui seria a parte do sensor</Text>
       </View>
       <StatusBar style="auto" />
     </View>

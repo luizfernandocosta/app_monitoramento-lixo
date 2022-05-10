@@ -7,31 +7,29 @@ import {
   Image,
   TouchableOpacity,
   TextInput,
-  Alert
+  Alert,
+  ActivityIndicator
 } from "react-native";
 import AppLoading from "expo-app-loading";
 import { useFonts } from "expo-font";
 import axios from "axios";
-import { 
-  AMAZON_API_HOST,
-  AMAZON_API_URL,
-  AMAZON_API_ACCESS_KEY_ID,
-  AMAZON_API_SECRET_ACCESS_KEY,
-  AMAZON_API_AUTH_PATH
- } from "@env";
- import aws4, { sign } from "react-native-aws4";
+import aws4, { sign } from "react-native-aws4";
 
 export default function App({ navigation }) {
 
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
 
+  const [isLoading, setIsLoading] = React.useState(false);
+
   const handleSignIn = async () => {
+
+    setIsLoading(true);
 
     let request = {
       method: 'POST',
-      host: AMAZON_API_HOST,
-      path: AMAZON_API_AUTH_PATH,
+      host: process.env.AMAZON_API_HOST,
+      path: process.env.AMAZON_API_AUTH_PATH,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -39,7 +37,7 @@ export default function App({ navigation }) {
         email: email,
         password: password
       }),
-      url: AMAZON_API_URL,
+      url: process.env.AMAZON_API_URL,
       data: {
         email: email,
         password: password
@@ -47,16 +45,14 @@ export default function App({ navigation }) {
     }
     
     let signedRequest = aws4.sign(request,{
-      accessKeyId: AMAZON_API_ACCESS_KEY_ID,
-      secretAccessKey: AMAZON_API_SECRET_ACCESS_KEY
+      accessKeyId: process.env.AMAZON_API_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AMAZON_API_SECRET_ACCESS_KEY
     });
-
-    // console.log(AMAZON_API_URL)
-
 
     await axios(signedRequest)
     .then(response => {
       console.log(response.data)
+      setIsLoading(false)
       switch (response.data)
       {
         case "auth/invalid-email":
@@ -81,8 +77,12 @@ export default function App({ navigation }) {
           Alert.alert("Erro interno", "Por favor, tente novamente mais tarde.");
           break;
         default:
-          navigation.navigate("Dash", {
-            response: response.data
+          navigation.navigate("Tab", {
+            screen: "Dash",
+            params: {
+              screen: "Sensor",
+              response: response.data
+            }
           });
           break;          
       }
@@ -110,6 +110,7 @@ export default function App({ navigation }) {
         <Text style={styles.welcomeSubtitle}>Sign in to your account</Text>
       </View>
       <View style={styles.inputView}>
+      
         <TextInput
           style={styles.input}
           placeholder="Username, phone or e-mail"
@@ -117,6 +118,7 @@ export default function App({ navigation }) {
           selectionColor="#1a1b1f"
           value={email}
           onChangeText={text => setEmail(text)}
+          autoCapitalize="none"
         />
         <TextInput
           style={[{ marginTop: 20 }, styles.input]}
@@ -144,18 +146,22 @@ export default function App({ navigation }) {
         activeOpacity={0.8}
         onPress={handleSignIn}
         >
-          <Text style={styles.buttonText}>Sign in</Text>
+          <Text style={styles.buttonText}>{ !isLoading ? "Sign in" : <ActivityIndicator size="large" color="#F6F8FF" /> }</Text>
         </TouchableOpacity>
         <View style={styles.buttonRegister}>
           <Text style={styles.buttonInfo}>Don't have an account?</Text>
-          <Text
-            style={[
-              { marginLeft: 2, fontFamily: "Inter-SemiBold" },
-              styles.buttonInfo,
-            ]}
+          <TouchableOpacity
+            onPress={() => navigation.navigate("SignUp")}
           >
-            Register here!
-          </Text>
+            <Text
+              style={[
+                { marginLeft: 2, fontFamily: "Inter-SemiBold" },
+                styles.buttonInfo,
+              ]}
+            >
+              Register here!
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
       <StatusBar style="auto" />
@@ -200,7 +206,6 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.32,
     shadowRadius: 5.46,
-
     elevation: 9,
     backgroundColor: "#fff",
   },

@@ -4,191 +4,160 @@ import {
   StyleSheet,
   Text,
   View,
-  Image,
-  TouchableOpacity,
-  TextInput,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AppLoading from "expo-app-loading";
 import { useFonts } from "expo-font";
+import { SignUpInput } from "../components/SignUpInput";
+import axios from "axios";
+import aws4, { sign } from "react-native-aws4";
 
 export default function App({ navigation }) {
   // Creating state for view select
   const [selectTab, setSelectTab] = React.useState(1);
 
-  // View for FirstName
-  function FirstName() {
-    return (
-      <View>
-        <Text styles={{ fontFamily: "Inter-Regular" }}>
-          Lets start with your name!
-        </Text>
-        <TextInput
-          style={[{ marginTop: 5 }, styles.input]}
-          underlineColorAndroid="transparent"
-          placeholder="First name"
-          placeholderTextColor={"#918F8C"}
-          selectionColor="#1a1b1f"
-        />
-        <TouchableOpacity
-          style={[{ backgroundColor: "#6E45B7" }, styles.button]}
-          activeOpacity={0.8}
-          onPress={() => setSelectTab(selectTab + 1)}
-        >
-          <Text style={styles.buttonText}>{">"}</Text>
-        </TouchableOpacity>
-      </View>
-    );
+  const [name, setName] = React.useState("");
+  const [lastName, setLastName] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  const handleSignUp = async () => {
+
+    setIsLoading(true);
+
+    let request = {
+
+      method: 'POST',
+      host: process.env.AMAZON_API_HOST,
+      path: process.env.AMAZON_API_CREATE_PATH,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: email,
+        password: password,
+        name: `${name} ${lastName}`,
+      }),
+      url: process.env.AMAZON_API_CREATE_URL,
+      data: {
+        email: email,
+        password: password,
+        name: `${name} ${lastName}`,
+      }
+    }
+
+    let signedRequest = aws4.sign(request,{
+      accessKeyId: process.env.AMAZON_API_CREATE_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AMAZON_API_CREATE_SECRET_ACCESS_KEY
+    });
+
+    await axios(signedRequest)
+    .then(response => {
+      setIsLoading(false)
+      switch (response.data)
+      {
+        case "auth/email-already-in-use":
+          Alert.alert("Email em uso", "Este e-mail já está em uso!");
+          break;
+        default:
+          navigation.navigate("Tab", {
+            screen: "Dash",
+            params: {
+              screen: "Sensor",
+              response: response.data
+            }
+          });
+          break;          
+      }
+    })
+    .catch(error => {
+      Alert.alert("Erro", "Por favor, verifique os dados e tente novamente.");
+    });
+
   }
 
-  // View for LastName
-  function LastName() {
-    return (
-      <View>
-        <Text styles={{ fontFamily: "Inter-Regular" }}>
-          Now your last name!
-        </Text>
-        <TextInput
-          style={[{ marginTop: 5 }, styles.input]}
-          placeholder="Last name"
-          placeholderTextColor={"#918F8C"}
-          selectionColor="#1a1b1f"
-        />
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <TouchableOpacity
-            style={[{ backgroundColor: "#6E45B7" }, styles.button]}
-            activeOpacity={0.8}
-            onPress={() => setSelectTab(selectTab - 1)}
-          >
-            <Text style={styles.buttonText}>{"<"}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[{ backgroundColor: "#6E45B7" }, styles.button]}
-            activeOpacity={0.8}
-            onPress={() => setSelectTab(selectTab + 1)}
-          >
-            <Text style={styles.buttonText}>{">"}</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  }
+  const moveToPreviousPage = () => {
+    setSelectTab(selectTab - 1);
+  };
 
-  // View for Email
-  function Email() {
-    return (
-      <View>
-        <Text styles={{ fontFamily: "Inter-Regular" }}>
-          Now insert your e-mail!
-        </Text>
-        <TextInput
-          style={[{ marginTop: 5 }, styles.input]}
-          placeholder="E-mail"
-          placeholderTextColor={"#918F8C"}
-          selectionColor="#1a1b1f"
-          keyboardType="email-address"
-        />
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <TouchableOpacity
-            style={[{ backgroundColor: "#6E45B7" }, styles.button]}
-            activeOpacity={0.8}
-            onPress={() => setSelectTab(selectTab - 1)}
-          >
-            <Text style={styles.buttonText}>{"<"}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[{ backgroundColor: "#6E45B7" }, styles.button]}
-            activeOpacity={0.8}
-            onPress={() => setSelectTab(selectTab + 1)}
-          >
-            <Text style={styles.buttonText}>{">"}</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  }
-
-  // View for PhoneNumber
-  function PhoneNumber() {
-    return (
-      <View>
-        <Text styles={{ fontFamily: "Inter-Regular" }}>
-          Now put your phone number!
-        </Text>
-        <TextInput
-          style={[{ marginTop: 5 }, styles.input]}
-          placeholder="Number"
-          placeholderTextColor={"#918F8C"}
-          selectionColor="#1a1b1f"
-          keyboardType="phone-pad"
-        />
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <TouchableOpacity
-            style={[{ backgroundColor: "#6E45B7" }, styles.button]}
-            activeOpacity={0.8}
-            onPress={() => setSelectTab(selectTab - 1)}
-          >
-            <Text style={styles.buttonText}>{"<"}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[{ backgroundColor: "#6E45B7" }, styles.button]}
-            activeOpacity={0.8}
-            onPress={() => setSelectTab(selectTab + 1)}
-          >
-            <Text style={styles.buttonText}>{">"}</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  }
-
-  // View for Password
-  function Password() {
-    return (
-      <View>
-        <Text styles={{ fontFamily: "Inter-Regular" }}>
-          And to end, insert a secure password!
-        </Text>
-        <TextInput
-          style={[{ marginTop: 5 }, styles.input]}
-          placeholder="Password"
-          placeholderTextColor={"#918F8C"}
-          selectionColor="#1a1b1f"
-          secureTextEntry={true}
-        />
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <TouchableOpacity
-            style={[{ backgroundColor: "#6E45B7" }, styles.button]}
-            activeOpacity={0.8}
-            onPress={() => setSelectTab(selectTab - 1)}
-          >
-            <Text style={styles.buttonText}>{"<"}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[{ backgroundColor: "#6E45B7" }, styles.buttonRegister]}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.buttonText}>Create account!</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  }
+  const moveToNextPage = () => {
+    setSelectTab(selectTab + 1);
+  };
 
   // Switch for switch between views
   const selectedTab = () => {
     switch (selectTab) {
       case 1:
-        return <FirstName />;
+        return (
+          <SignUpInput
+            moveToNextPage={moveToNextPage}
+            selectTab={selectTab}
+            currentValue={name}
+            setValue={setName}
+            description="Lets start with your name!"
+            placeholder="First name"
+            regex={/[a-zA-Z]{3,}/g}
+            autoCapitalize="words"
+            secureTextEntry={false}
+            errorMessage="Names should have characters only!"
+          />
+        );
       case 2:
-        return <LastName />;
+        return (
+          <SignUpInput
+            moveToPreviousPage={moveToPreviousPage}
+            selectTab={selectTab}
+            moveToNextPage={moveToNextPage}
+            currentValue={lastName}
+            setValue={setLastName}
+            description="Now your last name! (this one is optional)"
+            placeholder="Last name"
+            autoCapitalize="words"
+            secureTextEntry={false}
+            regex={/[a-zA-Z]{3,}/g}
+            errorMessage="Names should have characters only!"
+          />
+        );
       case 3:
-        return <Email />;
+        return (
+          <SignUpInput
+            moveToPreviousPage={moveToPreviousPage}
+            selectTab={selectTab}
+            moveToNextPage={moveToNextPage}
+            currentValue={email}
+            setValue={setEmail}
+            description="Now insert your e-mail!"
+            placeholder="E-mail"
+            autoCapitalize="none"
+            secureTextEntry={false}
+            regex={/(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/g}
+            errorMessage="Please, insert a valid e-mail!"
+          />
+        );
       case 4:
-        return <PhoneNumber />;
-      case 5:
-        return <Password />;
+        return (
+          <SignUpInput
+            moveToPreviousPage={moveToPreviousPage}
+            selectTab={selectTab}
+            moveToNextPage={moveToNextPage}
+            currentValue={password}
+            setValue={setPassword}
+            description="Now insert a secure password!"
+            placeholder="Password"
+            autoCapitalize="none"
+            secureTextEntry={true}
+            lastStep={true}
+            handleSignUp={handleSignUp}
+            regex={/[a-zA-Z0-9]{8,}/g}
+            errorMessage="Password should have at least 8 characters!"
+            isLoading={isLoading}
+          />
+        );
     }
   };
 
@@ -212,7 +181,7 @@ export default function App({ navigation }) {
         <Text style={styles.welcomeTitle}>First time here?</Text>
         <Text style={styles.welcomeSubtitle}>Lets create your account!</Text>
       </View>
-      <View>{selectedTab()}</View>
+      {selectedTab()}
       <View></View>
       <StatusBar style="auto" />
     </View>
