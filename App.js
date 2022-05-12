@@ -8,12 +8,11 @@ import SignIn from "./screens/SignIn";
 import SignUp from "./screens/SignUp";
 import Dash from "./screens/Dash";
 import Sensor from "./screens/Sensor";
+import ForgotPassword from "./screens/ForgotPassword";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faMicrochip } from "@fortawesome/free-solid-svg-icons";
+import { faMicrochip, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { useFonts } from "expo-font";
 import AppLoading from "expo-app-loading";
-
-import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 
 // Creating a Stack Navigator
 const Home = createNativeStackNavigator();
@@ -71,8 +70,7 @@ const TabNavigation = () => (
             icon={faTrashAlt}
             size={20}
             color={focused ? "#6E45B7" : "#1A1B1F"}
-          >
-          </FontAwesomeIcon>
+          />
           <Text
             style={{
               fontFamily: focused ? "Inter-Medium" : "Inter-Light",
@@ -104,8 +102,7 @@ const TabNavigation = () => (
             icon={faMicrochip}
             size={20}
             color={focused ? "#6E45B7" : "#1A1B1F"}
-          >
-          </FontAwesomeIcon>
+          />
           <Text
             style={{
               fontFamily: focused ? "Inter-Medium" : "Inter-Light",
@@ -150,6 +147,7 @@ export default function App() {
         <Home.Screen name="SignIn" component={SignIn} />
         <Home.Screen name="SignUp" component={SignUp} />
         <Home.Screen name="Tab" component={TabNavigation} />
+        <Home.Screen name="ForgotPassword" component={ForgotPassword} />
       </Home.Navigator>
     </NavigationContainer>
   );

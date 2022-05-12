@@ -5,8 +5,11 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  ActivityIndicator
+  ActivityIndicator,
+  Pressable,
 } from "react-native";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
 // View for FirstName
 export function SignUpInput({
@@ -23,31 +26,47 @@ export function SignUpInput({
   lastStep,
   handleSignUp,
   errorMessage,
-  isLoading
+  isLoading,
+  icon,
+  password
 }) {
-
-
   const [borderColor, setBorderColor] = React.useState("#F6F8FF");
   const [borderWidth, setBorderWidth] = React.useState(1);
 
   const [error, setError] = React.useState(false);
 
-  const validateInput = (input) => {
+  const [passwordVisible, setPasswordVisible] = React.useState(true);
 
-    if (regex.test(input))
-    {
+  const [passwordIcon, setPasswordIcon] = React.useState(faEye);
+
+  const validateInput = (input) => {
+    if (regex.test(input)) {
       setBorderColor("#00A376");
       setBorderWidth(1);
-      setValue(input)
-      setError(false)
+      setValue(input);
+      setError(false);
       return true;
-    }
-    else
-    {
+    } else {
       setBorderColor("#A32400");
       setBorderWidth(1);
-      setValue(input)
+      setValue(input);
       setError(true);
+      return false;
+    }
+  };
+
+  const validatePassword = (input) => {
+    if (input === password) {
+      setBorderColor("#00A376");
+      setBorderWidth(1);
+      setError(false);
+      setValue(input)
+      return true;
+    } else {
+      setBorderColor("#A32400");
+      setBorderWidth(1);
+      setError(true);
+      setValue(input);
       return false;
     }
   }
@@ -55,26 +74,47 @@ export function SignUpInput({
   return (
     <View>
       <Text styles={{ fontFamily: "Inter-Regular" }}>{description}</Text>
-      <TextInput
+      <View
         style={[
           {
-            marginTop: 5,
             borderColor: borderColor,
             borderWidth: borderWidth,
           },
-          styles.input,
+          styles.inputView,
         ]}
-        underlineColorAndroid="transparent"
-        placeholder={placeholder}
-        placeholderTextColor={"#918F8C"}
-        selectionColor="#1a1b1f"
-        autoCapitalize={autoCapitalize}
-        onChangeText={(text) => validateInput(text)}
-        value={currentValue}
-        defaultValue={currentValue}
-        secureTextEntry={secureTextEntry}
-      />
-      <Text styles={{ fontFamily: "Inter-Regular" }}>{error && errorMessage}</Text>
+      >
+        <TextInput
+          style={[{}, styles.input]}
+          underlineColorAndroid="transparent"
+          placeholder={placeholder}
+          placeholderTextColor={"#918F8C"}
+          selectionColor="#1a1b1f"
+          autoCapitalize={autoCapitalize}
+          onChangeText={(text) => lastStep ? validatePassword(text) : validateInput(text)}
+          value={currentValue}
+          defaultValue={currentValue}
+          secureTextEntry={secureTextEntry ? passwordVisible : secureTextEntry}
+        />
+        {!secureTextEntry ? (
+          <FontAwesomeIcon icon={icon} size={25} color="#161518" />
+        ) : (
+          <Pressable
+            onPressIn={() => {
+              setPasswordIcon(faEyeSlash);
+              setPasswordVisible(false);
+            }}
+            onPressOut={() => {
+              setPasswordIcon(faEye);
+              setPasswordVisible(true);
+            }}
+          >
+            <FontAwesomeIcon icon={passwordIcon} size={25} color="#161518" />
+          </Pressable>
+        )}
+      </View>
+      <Text styles={{ fontFamily: "Inter-Regular" }}>
+        {error && errorMessage}
+      </Text>
       <View
         style={{
           flexDirection: "row",
@@ -99,13 +139,10 @@ export function SignUpInput({
             activeOpacity={0.8}
             disabled={error}
             onPress={() => {
-              
-              if (validateInput(currentValue))
-              {
+              if (validateInput(currentValue)) {
                 moveToNextPage();
                 setBorderColor("transparent");
               }
-              
             }}
           >
             <Text style={styles.buttonText}>{">"}</Text>
@@ -116,9 +153,21 @@ export function SignUpInput({
           <TouchableOpacity
             style={[{ backgroundColor: "#6E45B7" }, styles.buttonRegister]}
             activeOpacity={0.8}
-            onPress={handleSignUp}
+            disabled={error}
+            onPress={() => {
+              if (validatePassword(currentValue)) {
+                handleSignUp();
+                setBorderColor("transparent");
+              }
+            }}
           >
-            <Text style={styles.buttonText}>{ !isLoading ? "Create account!" : <ActivityIndicator size="large" color="#F6F8FF" /> }</Text>
+            <Text style={styles.buttonText}>
+              {!isLoading ? (
+                "Create account!"
+              ) : (
+                <ActivityIndicator size="large" color="#F6F8FF" />
+              )}
+            </Text>
           </TouchableOpacity>
         )}
       </View>
@@ -128,35 +177,14 @@ export function SignUpInput({
 
 // StyleSheet for component
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F6F8FF",
-    alignItems: "center",
-    justifyContent: "space-around",
-  },
-  welcomeView: {
-    alignSelf: "flex-start",
-    marginLeft: 20,
-  },
-  welcomeTitle: {
-    fontSize: 36,
-    fontFamily: "Inter-Bold",
-  },
-  welcomeSubtitle: {
-    fontSize: 24,
-    fontFamily: "Inter-Regular",
-  },
   inputView: {
-    justifyContent: "center",
+    marginTop: 5,
+    flexDirection: "row",
+    justifyContent: "space-around",
     alignItems: "center",
-  },
-  input: {
     width: 300,
     height: 60,
-    borderRadius: 10,
-    padding: 10,
-    fontFamily: "Inter-Regular",
-    color: "#161518",
+    backgroundColor: "#fff",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -164,17 +192,16 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.32,
     shadowRadius: 5.46,
-
     elevation: 9,
-    backgroundColor: "#fff",
+    borderRadius: 10,
   },
-  alternateView: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 20,
+  input: {
+    width: "80%",
+    padding: 10,
+    fontFamily: "Inter-Regular",
+    color: "#161518",
+    borderRadius: 10,
   },
-  buttonView: {},
   button: {
     width: 60,
     height: 60,

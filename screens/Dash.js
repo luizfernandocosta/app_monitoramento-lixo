@@ -31,8 +31,8 @@ export default function App({ navigation, route }) {
       <View style={styles.welcomeView}>
         <Text style={styles.welcomeTitle}>Funcionou</Text>
         <Text style={styles.welcomeSubtitle}>Autenticado no Firebase</Text>
-        <Text style={styles.welcomeSubtitle}>Seja bem vindo, {info.name}</Text>
-        <Text style={styles.welcomeSubtitle}>{info.email}</Text>
+        <Text style={styles.welcomeSubtitle}>Seja bem vindo, {info.name.split(" ")[0]}</Text>
+        <Text style={styles.welcomeSubtitle}>{info.email.split("@")[0]}</Text>
       </View>
       <StatusBar style="auto" />
     </View>

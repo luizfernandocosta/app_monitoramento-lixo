@@ -14,6 +14,8 @@ import AppLoading from "expo-app-loading";
 import { useFonts } from "expo-font";
 import axios from "axios";
 import aws4, { sign } from "react-native-aws4";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faSignInAlt } from "@fortawesome/free-solid-svg-icons";
 
 export default function App({ navigation }) {
 
@@ -142,11 +144,27 @@ export default function App({ navigation }) {
       </View>
       <View style={styles.buttonView}>
         <TouchableOpacity 
-        style={styles.button} 
+        style={[{ flexDirection: 'row'},styles.button]} 
         activeOpacity={0.8}
         onPress={handleSignIn}
         >
-          <Text style={styles.buttonText}>{ !isLoading ? "Sign in" : <ActivityIndicator size="large" color="#F6F8FF" /> }</Text>
+
+        { !isLoading ? 
+          (<View
+            style={{
+              width: '100%',
+              flex: 1,
+              flexDirection: "row",
+              justifyContent: "center",
+            }}
+          >
+            <Text style={[{alignSelf: 'center'},styles.buttonText]}>Sign In</Text>
+            
+          </View>
+             
+         ) : 
+          <ActivityIndicator size="large" color="#F6F8FF" /> 
+         }
         </TouchableOpacity>
         <View style={styles.buttonRegister}>
           <Text style={styles.buttonInfo}>Don't have an account?</Text>
@@ -160,6 +178,21 @@ export default function App({ navigation }) {
               ]}
             >
               Register here!
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.buttonRegister}>
+          <Text style={styles.buttonInfo}>Forgot password?</Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("ForgotPassword")}
+          >
+            <Text
+              style={[
+                { marginLeft: 2, fontFamily: "Inter-SemiBold" },
+                styles.buttonInfo,
+              ]}
+            >
+              Click here!
             </Text>
           </TouchableOpacity>
         </View>

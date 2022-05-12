@@ -1,19 +1,12 @@
 import * as React from "react";
 import { StatusBar } from "expo-status-bar";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Alert,
-  ActivityIndicator,
-} from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { StyleSheet, Text, View, Alert, ActivityIndicator } from "react-native";
 import AppLoading from "expo-app-loading";
 import { useFonts } from "expo-font";
 import { SignUpInput } from "../components/SignUpInput";
 import axios from "axios";
 import aws4, { sign } from "react-native-aws4";
+import { faUser, faAt, faKey } from "@fortawesome/free-solid-svg-icons";
 
 export default function App({ navigation }) {
   // Creating state for view select
@@ -23,20 +16,19 @@ export default function App({ navigation }) {
   const [lastName, setLastName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
-  
+  const [confirmPassword, setConfirmPassword] = React.useState("");
+
   const [isLoading, setIsLoading] = React.useState(false);
 
   const handleSignUp = async () => {
-
     setIsLoading(true);
 
     let request = {
-
-      method: 'POST',
+      method: "POST",
       host: process.env.AMAZON_API_HOST,
       path: process.env.AMAZON_API_CREATE_PATH,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         email: email,
@@ -48,38 +40,36 @@ export default function App({ navigation }) {
         email: email,
         password: password,
         name: `${name} ${lastName}`,
-      }
-    }
+      },
+    };
 
-    let signedRequest = aws4.sign(request,{
+    let signedRequest = aws4.sign(request, {
       accessKeyId: process.env.AMAZON_API_CREATE_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AMAZON_API_CREATE_SECRET_ACCESS_KEY
+      secretAccessKey: process.env.AMAZON_API_CREATE_SECRET_ACCESS_KEY,
     });
 
     await axios(signedRequest)
-    .then(response => {
-      setIsLoading(false)
-      switch (response.data)
-      {
-        case "auth/email-already-in-use":
-          Alert.alert("Email em uso", "Este e-mail já está em uso!");
-          break;
-        default:
-          navigation.navigate("Tab", {
-            screen: "Dash",
-            params: {
-              screen: "Sensor",
-              response: response.data
-            }
-          });
-          break;          
-      }
-    })
-    .catch(error => {
-      Alert.alert("Erro", "Por favor, verifique os dados e tente novamente.");
-    });
-
-  }
+      .then((response) => {
+        setIsLoading(false);
+        switch (response.data) {
+          case "auth/email-already-in-use":
+            Alert.alert("Email em uso", "Este e-mail já está em uso!");
+            break;
+          default:
+            navigation.navigate("Tab", {
+              screen: "Dash",
+              params: {
+                screen: "Sensor",
+                response: response.data,
+              },
+            });
+            break;
+        }
+      })
+      .catch((error) => {
+        Alert.alert("Erro", "Por favor, verifique os dados e tente novamente.");
+      });
+  };
 
   const moveToPreviousPage = () => {
     setSelectTab(selectTab - 1);
@@ -105,6 +95,7 @@ export default function App({ navigation }) {
             autoCapitalize="words"
             secureTextEntry={false}
             errorMessage="Names should have characters only!"
+            icon={faUser}
           />
         );
       case 2:
@@ -121,6 +112,7 @@ export default function App({ navigation }) {
             secureTextEntry={false}
             regex={/[a-zA-Z]{3,}/g}
             errorMessage="Names should have characters only!"
+            icon={faUser}
           />
         );
       case 3:
@@ -135,8 +127,11 @@ export default function App({ navigation }) {
             placeholder="E-mail"
             autoCapitalize="none"
             secureTextEntry={false}
-            regex={/(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/g}
+            regex={
+              /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/g
+            }
             errorMessage="Please, insert a valid e-mail!"
+            icon={faAt}
           />
         );
       case 4:
@@ -151,11 +146,31 @@ export default function App({ navigation }) {
             placeholder="Password"
             autoCapitalize="none"
             secureTextEntry={true}
-            lastStep={true}
-            handleSignUp={handleSignUp}
             regex={/[a-zA-Z0-9]{8,}/g}
             errorMessage="Password should have at least 8 characters!"
             isLoading={isLoading}
+            icon={faKey}
+          />
+        );
+      case 5:
+        return (
+          <SignUpInput
+            moveToPreviousPage={moveToPreviousPage}
+            selectTab={selectTab}
+            moveToNextPage={moveToNextPage}
+            currentValue={confirmPassword}
+            setValue={setConfirmPassword}
+            password={password}
+            description="Now confirm your password!"
+            placeholder="Password"
+            autoCapitalize="none"
+            secureTextEntry={true}
+            lastStep={true}
+            handleSignUp={handleSignUp}
+            regex={/[a-zA-Z0-9]{8,}/g}
+            errorMessage="Passwords do not match!"
+            isLoading={isLoading}
+            icon={faKey}
           />
         );
     }
